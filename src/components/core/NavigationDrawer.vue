@@ -4,7 +4,7 @@
     fixed app>
     <v-toolbar flat dark :color="$root.themeColor" class="toolbar">
       <router-link :to="{ name: 'Dashboard' }">
-        <img src="static/logo.png" width="36px"></img>
+        <img src="static/logo.png" width="36px" />
       </router-link>
       <router-link :to="{ name: 'Dashboard' }" class="text">
          Vue Admin Template
@@ -18,7 +18,7 @@
         <v-list-tile-title :class="[{'active': selectedIndex === 1}, 'item-title' ]" >{{ $t('dashboard') }}</v-list-tile-title>
       </v-list-tile>
 
-      <v-list-tile @click="changeRoute('Calendar', 2)">
+      <!-- <v-list-tile @click="changeRoute('Calendar', 2)">
         <v-list-tile-action>
           <v-icon>calendar_today</v-icon>
         </v-list-tile-action>
@@ -68,7 +68,7 @@
           </v-list-tile-action>
           <v-list-tile-title :class="[{'active': selectedIndex === 7}, 'item-title' ]">{{ $t('snackbar') }}</v-list-tile-title>
         </v-list-tile>
-    </v-list-group>
+    </v-list-group> -->
 
       <v-list-group
         prepend-icon="fingerprint">
@@ -110,13 +110,14 @@
       <v-list-tile slot="activator">
         <v-list-tile-title class="item-title">{{ $t('users') }}</v-list-tile-title>
       </v-list-tile>
-        <v-list-tile  @click="">
-            <v-list-tile-action>
-              <v-icon v-text="'people_outline'"></v-icon>
-            </v-list-tile-action>
-            <v-list-tile-title v-text="'Management'"></v-list-tile-title>
-      </v-list-tile>
-      <v-list-tile  @click="">
+
+      <v-list-tile @click="changeRoute('Users', 2)">
+          <v-list-tile-action>
+            <v-icon v-text="'people_outline'"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title class="item-title" v-text="'User Group'"></v-list-tile-title>
+        </v-list-tile>
+      <v-list-tile>
           <v-list-tile-action>
             <v-icon v-text="'settings'"></v-icon>
           </v-list-tile-action>
@@ -131,52 +132,53 @@
 export default {
   props: {
     toggle: {
-        type: Boolean,
-        required: false,
-        default: true
-    }
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
 
   data() {
     return {
-      selectedIndex: 1
-    }
+      selectedIndex: 1,
+    };
   },
 
   methods: {
-    changeRoute(routeName, selectedIndex) {
+    changeRoute(routeName, selectedIndex = 0) {
       const vm = this;
-
       vm.selectedIndex = selectedIndex;
-
+      if (this.$route.name === routeName) {
+        return
+      }
       return vm.$router.push({ name: routeName });
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
-  .toolbar {
-    font-weight: bold;
-    font-size: 18px;
-  }
+.toolbar {
+  font-weight: bold;
+  font-size: 18px;
+}
 
-  .toolbar .text {
-    padding-left: 15px;
-    color: white;
-    text-decoration:none;
-  }
+.toolbar .text {
+  padding-left: 15px;
+  color: white;
+  text-decoration: none;
+}
 
-  .item-title {
-    font-size: 17px;
-    font-weight: 500;
-  }
-  .item-sub-title {
-    font-size: 15px;
-    font-weight: 500;
-  }
+.item-title {
+  font-size: 17px;
+  font-weight: 500;
+}
+.item-sub-title {
+  font-size: 15px;
+  font-weight: 500;
+}
 
-  .active {
-    font-weight: bold;
-  }
+.active {
+  font-weight: bold;
+}
 </style>

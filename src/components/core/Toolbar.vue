@@ -6,12 +6,12 @@
     <v-toolbar-title>
       <v-toolbar-side-icon @click="toggleNavigationBar"></v-toolbar-side-icon>
     </v-toolbar-title>
-    <v-text-field
+    <!-- <v-text-field
       flat
       solo-inverted
       append-icon="search"
       :label="$t('search')">
-    </v-text-field>
+    </v-text-field> -->
     <v-spacer></v-spacer>
     <v-rating
         v-model="rating"
