@@ -1,13 +1,11 @@
 <template>
-  <v-navigation-drawer
-    v-model="toggle"
-    fixed app>
+  <v-navigation-drawer v-model="toggle" fixed app>
     <v-toolbar flat dark :color="$root.themeColor" class="toolbar">
       <router-link :to="{ name: 'Dashboard' }">
         <img src="static/logo.png" width="36px" />
       </router-link>
       <router-link :to="{ name: 'Dashboard' }" class="text">
-         Vue Admin Template
+        TKMTEMPFE
       </router-link>
     </v-toolbar>
     <v-list>
@@ -15,7 +13,10 @@
         <v-list-tile-action>
           <v-icon>dashboard</v-icon>
         </v-list-tile-action>
-        <v-list-tile-title :class="[{'active': selectedIndex === 1}, 'item-title' ]" >{{ $t('dashboard') }}</v-list-tile-title>
+        <v-list-tile-title
+          :class="[{ active: selectedIndex === 1 }, 'item-title']"
+          >{{ $t("dashboard") }}</v-list-tile-title
+        >
       </v-list-tile>
 
       <!-- <v-list-tile @click="changeRoute('Calendar', 2)">
@@ -70,27 +71,34 @@
         </v-list-tile>
     </v-list-group> -->
 
-      <v-list-group
-        prepend-icon="fingerprint">
+      <v-list-group prepend-icon="fingerprint">
         <v-list-tile slot="activator">
-          <v-list-tile-title class="item-title">{{ $t('authorization') }}</v-list-tile-title>
+          <v-list-tile-title class="item-title">{{
+            $t("authorization")
+          }}</v-list-tile-title>
         </v-list-tile>
 
-        <v-list-tile @click="$router.push({ name: 'Error', params: { errorCode: '403' } })">
+        <v-list-tile
+          @click="$router.push({ name: 'Error', params: { errorCode: '403' } })"
+        >
           <v-list-tile-action>
             <v-icon>cancel</v-icon>
           </v-list-tile-action>
           <v-list-tile-title class="item-title">403</v-list-tile-title>
         </v-list-tile>
 
-        <v-list-tile @click="$router.push({ name: 'Error', params: { errorCode: '404' } })">
+        <v-list-tile
+          @click="$router.push({ name: 'Error', params: { errorCode: '404' } })"
+        >
           <v-list-tile-action>
             <v-icon>cancel</v-icon>
           </v-list-tile-action>
           <v-list-tile-title class="item-title">404</v-list-tile-title>
         </v-list-tile>
 
-        <v-list-tile @click="$router.push({ name: 'Error', params: { errorCode: '500' } })">
+        <v-list-tile
+          @click="$router.push({ name: 'Error', params: { errorCode: '500' } })"
+        >
           <v-list-tile-action>
             <v-icon>cancel</v-icon>
           </v-list-tile-action>
@@ -101,29 +109,65 @@
           <v-list-tile-action>
             <v-icon>cancel</v-icon>
           </v-list-tile-action>
-          <v-list-tile-title class="item-title">{{ $t('login') }}</v-list-tile-title>
+          <v-list-tile-title class="item-title">{{
+            $t("login")
+          }}</v-list-tile-title>
         </v-list-tile>
-    </v-list-group>
+      </v-list-group>
+      <!-- Group -->
+      <v-list-group prepend-icon="account_circle">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">{{
+            $t("Groups")
+          }}</v-list-tile-title>
+        </v-list-tile>
 
-      <v-list-group
-      prepend-icon="account_circle">
-      <v-list-tile slot="activator">
-        <v-list-tile-title class="item-title">{{ $t('users') }}</v-list-tile-title>
-      </v-list-tile>
-
-      <v-list-tile @click="changeRoute('Users', 2)">
+        <v-list-tile @click="changeRoute('Groups', 2)">
           <v-list-tile-action>
             <v-icon v-text="'people_outline'"></v-icon>
           </v-list-tile-action>
-          <v-list-tile-title class="item-title" v-text="'User Group'"></v-list-tile-title>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'Groups'"
+          ></v-list-tile-title>
         </v-list-tile>
-      <v-list-tile>
+      </v-list-group>
+      <!-- User -->
+      <v-list-group prepend-icon="account_circle">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">{{
+            $t("Users")
+          }}</v-list-tile-title>
+        </v-list-tile>
+
+        <v-list-tile @click="changeRoute('Users', 3)">
           <v-list-tile-action>
-            <v-icon v-text="'settings'"></v-icon>
+            <v-icon v-text="'people_outline'"></v-icon>
           </v-list-tile-action>
-          <v-list-tile-title v-text="'Settings'"></v-list-tile-title>
-      </v-list-tile>
-    </v-list-group>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'User'"
+          ></v-list-tile-title>
+        </v-list-tile>
+      </v-list-group>
+      <!-- Chức năng -->
+      <v-list-group prepend-icon="fas fa-list">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">
+            Quản trị hệ thống
+          </v-list-tile-title>
+        </v-list-tile>
+
+        <v-list-tile @click="changeRoute('Features', 4)">
+          <v-list-tile-action>
+            <v-icon v-text="'fas fa-list'"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'Chức năng'"
+          ></v-list-tile-title>
+        </v-list-tile>
+      </v-list-group>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -149,7 +193,7 @@ export default {
       const vm = this;
       vm.selectedIndex = selectedIndex;
       if (this.$route.name === routeName) {
-        return
+        return;
       }
       return vm.$router.push({ name: routeName });
     },

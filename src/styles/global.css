@@ -1,5 +1,62 @@
 html,
 body {
-  font-weight: 500;
-  font-size: 15px;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.header-table__color,
+.el-table--border th {
+    font-family: Lato-Bold !important;
+    font-size: 14px !important;
+    color: #fff !important;
+    line-height: 1.4 !important;
+    background-color: #6c7ae0 !important;
+}
+
+.theme--light.v-table thead th {
+    color: #fff;
+}
+
+.v-datatable tbody tr:nth-child(even) {
+    background-color: #f8f6ff;
+}
+
+tr.el-table__row:nth-child(even) {
+    background-color: #f8f6ff;
+}
+
+.v-datatable tbody tr td {
+    font-family: Lato-Regular;
+    font-size: 15px;
+    color: gray;
+    line-height: 1.4;
+}
+
+.v-card {
+    border-radius: 10px;
+}
+
+.details-modal-title {
+    color: #111827;
+    pointer-events: all;
+    position: relative;
+    width: calc(100% - 4.5em);
+}
+
+.details-modal-title .h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.border-title-header {
+    margin-top: 10px;
+    width: 100%;
+    height: 2px;
+    background-color: rgb(221, 219, 219);
+}
+
+.btn-radius {
+    border-radius: 4px;
+    color: #fff !important;
 }

@@ -12,6 +12,7 @@ export class AuthService {
         try {
             const requestBody = { username: username, password: password }
             const res = await axios.post(`/temproject/authenticate`, requestBody);
+
             return response.create(res, HTTP_STATUS.OK);
         } catch (error) {
             throw new error;

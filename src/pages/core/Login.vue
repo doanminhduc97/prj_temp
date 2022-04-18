@@ -4,7 +4,7 @@
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4 lg4>
-            <v-card class=" pa-3">
+            <v-card class="pa-3">
               <v-card-text>
                 <div class="layout column align-center">
                   <img
@@ -75,15 +75,16 @@ export default {
       },
     };
   },
-  created () {
-    localStorage.removeItem("jwt");;
+  created() {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("userInfo");
   },
   methods: {
     async login() {
       const vm = this;
 
       if (!vm.username || !vm.password) {
-        vm.result = "Email and Password can't be null.";
+        vm.result = "Username and Password can't be null.";
         vm.showResult = true;
 
         return;
@@ -94,12 +95,13 @@ export default {
           password: this.password,
         });
         this.error = "";
-        vm.$router.push({ name: "Dashboard" });
         console.log("res", res);
         localStorage.setItem("jwt", res.body.jwttoken);
+        localStorage.setItem("userInfo", JSON.stringify(res.body.userInfo));
+        vm.$router.push({ name: "Dashboard" });
       } catch (error) {
         vm.error = true;
-        vm.result = "Email or Password is incorrect.";
+        vm.result = "Username or Password is incorrect.";
         vm.showResult = true;
       }
     },

@@ -41,8 +41,10 @@ export default {
 <style>
   .breadcrumbs .link {
     text-decoration: none;
-    color: #737373;
-    font: bold 24px Sans-Serif;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 400;
+    font-family: sans-serif;
     letter-spacing: -1px;
     white-space: nowrap;
     display: inline-block;
