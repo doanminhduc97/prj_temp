@@ -25,7 +25,7 @@
               <v-flex sm4 md4 xl4>
                 <v-text-field
                   :readonly="isEditUser"
-                  v-model="cachedItem.account"
+                  v-model="cachedItem.acc"
                   :rules="[rules.required]"
                 ></v-text-field>
               </v-flex>
@@ -35,7 +35,7 @@
               <v-flex sm4 md4 xl4>
                 <v-text-field
                   type="password"
-                  v-model="cachedItem.pass"
+                  v-model="cachedItem.password"
                   :rules="[rules.required]"
                 ></v-text-field>
               </v-flex>
@@ -139,7 +139,6 @@
 </template>
 <script>
 import { UsersService } from "../../sevices/users.service";
-
 export default {
   name: "AddUserPage",
   data() {
@@ -148,8 +147,76 @@ export default {
       cachedItem: {
         id: "",
         userId: "",
-        account: "",
-        pass: "",
+        acc: null,
+        password: null,
+        confPass: "",
+        name: "",
+        email: "",
+        phone: "",
+        note: "",
+        admin: false,
+        lstGroup: [],
+      },
+      listGroups: [],
+      rules: {
+        required: (value) => !!value || "Không được bỏ trống!",
+      },
+      dialog: false,
+      messagePopup: "",
+      isEditUser: false,
+      titlePage: "",
+      flag: false,
+    };
+  },
+  created() {
+    this.initcachedItem();
+    this.titlePage = "Thêm mới người dùng";
+    // case edit user
+    if (this.$route.params.userId) {
+      this.titlePage = "Cập nhật người dùng";
+      console.log("user id", userId);
+      const userId = this.$route.params.userId
+      UsersService.getUserById(userId).then((res) => {
+        console.log("add user", res);
+        if (!res.success) {
+          this.$router.push({ name: "Error" });
+        }
+        this.isEditUser = true;
+
+        this.cachedItem = {
+          id: res.body.id,
+          userId: res.body.maNguoiDung,
+          account: res.body.taiKhoan,
+          pass: res.body.matKhau,
+          confPass: "",
+          name: res.body.hoTen,
+          email: res.body.email,
+          phone: res.body.diDong,
+          note: res.body.ghiChu,
+          admin: res.body.admin,
+          lstGroup: res.body.lstNhomNguoiDungId,
+        };
+      });
+    }
+    this.$store.dispatch("groups/getGroups").then((res) => {
+      res.forEach((item) => {
+        this.listGroups.push({
+          text: item.tenNhomNguoiDung,
+          value: item.id,
+        });
+      });
+    });
+  },
+  mounted() {
+    this.initcachedItem();
+  },
+  methods: {
+    initcachedItem() {
+      this.cachedItem = {
+        id: "",
+        userId: "",
+        acc: "",
+        password: "",
         confPass: "",
         name: "",
         email: "",
@@ -157,59 +224,10 @@ export default {
         note: "",
         admin: false,
         lstGroup: []
-      },
-      listGroups: [],
-      rules: {
-        required: value => !!value || "Không được bỏ trống!"
-      },
-      dialog: false,
-      messagePopup: "",
-      isEditUser: false,
-      titlePage: ""
-    };
-  },
-  created() {
-    this.titlePage = "Thêm mới người dùng"
-    // case edit user
-    if (this.$route.params.userId) {
-      this.titlePage = "Cập nhật người dùng"
-      const requestBody = {
-        sMaNguoiDung: this.$route.params.userId
-      };
-      UsersService.getUserById(requestBody).then(res => {
-        if (res.body.lstQtNguoiDung.length === 0) {
-          this.$router.push({ name: "Error" });
-        }
-
-        this.isEditUser = true;
-
-        this.cachedItem = {
-          id: res.body.lstQtNguoiDung[0].id,
-          userId: res.body.lstQtNguoiDung[0].maNguoiDung,
-          account: res.body.lstQtNguoiDung[0].taiKhoan,
-          pass: res.body.lstQtNguoiDung[0].matKhau,
-          confPass: "",
-          name: res.body.lstQtNguoiDung[0].hoTen,
-          email: res.body.lstQtNguoiDung[0].email,
-          phone: res.body.lstQtNguoiDung[0].diDong,
-          note: res.body.lstQtNguoiDung[0].ghiChu,
-          admin: res.body.lstQtNguoiDung[0].admin,
-          lstGroup: res.body.lstQtNguoiDung[0].lstNhomNguoiDungId
-        };
-      });
-    }
-
-    this.$store.dispatch("groups/getGroups").then(res => {
-      res.forEach(item => {
-        this.listGroups.push({
-          text: item.tenNhomNguoiDung,
-          value: item.id
-        });
-      });
-    });
-  },
-  methods: {
-    async onClickBtnAdd() {
+      }
+    },
+    onClickBtnAdd() {
+      this.flag = false;
       // check required
       if (
         this.cachedItem.userId == "" ||
@@ -233,7 +251,7 @@ export default {
         diDong: this.cachedItem.phone,
         admin: this.cachedItem.admin,
         lstNhomNguoiDungId: this.cachedItem.lstGroup,
-        note: this.cachedItem.note
+        note: this.cachedItem.note,
       };
 
       // case add
@@ -243,40 +261,96 @@ export default {
           this.messagePopup = "Xác nhận mật khẩu sai!";
           return;
         }
-        const res = await UsersService.addUser(requestBody);
-        if (res.success) {
-          this.$notify({
-            group: "notify",
-            type: "success",
-            title: "Thêm mới người dùng",
-            message: "Thêm mới người dùng thành công!",
-            position: "bottom",
-            duration: 2000
+        let paramCheck = {
+          maNguoiDung: this.cachedItem.userId,
+          id: 0,
+        };
+
+        // check exists userId
+        try {
+          UsersService.checkUserId(paramCheck).then((res) => {
+            if (res.body) {
+              this.dialog = true;
+              this.messagePopup =
+                "Mã người dùng đã tồn tại. Vui lòng nhập mã khác!";
+              return;
+            }
           });
+        } catch (error) {
+          this.dialog = true;
+          this.messagePopup ="Lỗi hệ thống !";
         }
-        // case update
+        paramCheck = {
+          username: this.cachedItem.name,
+          id: 0,
+        };
+        // check exists userName
+        try {
+          UsersService.checkUserName(paramCheck).then((res) => {
+            if (res.body) {
+              this.dialog = true;
+              this.messagePopup =
+                "Tên người dùng đã tồn tại. Vui lòng nhập tên khác!";
+              return;
+            }
+          });
+        } catch (error) {
+          this.dialog = true;
+          this.messagePopup ="Lỗi hệ thống !";
+        }
+        try {
+          UsersService.addUser(requestBody).then((res) => {
+            if (res.success) {
+              this.$notify({
+                group: "notify",
+                type: "success",
+                title: "Thêm mới người dùng",
+                message: "Thêm mới người dùng thành công!",
+                position: "bottom",
+                duration: 2000,
+              });
+            }
+          });
+        } catch (error) {
+          this.dialog = true;
+          this.messagePopup ="Lỗi hệ thống !";
+        }
+        this.flag = true;
+
+      // case update
       } else {
         requestBody.id = this.cachedItem.id;
-        console.log("request", requestBody);
-        const res = await UsersService.updateUser(requestBody);
-        if (res.success) {
-          this.$notify({
-            group: "notify",
-            type: "success",
-            title: "Cập nhật người dùng",
-            message: "Cập nhật người dùng thành công!",
-            position: "bottom",
-            duration: 2000
+        try {
+          UsersService.updateUser(requestBody).then((res) => {
+            if (res.success) {
+              this.$notify({
+                group: "notify",
+                type: "success",
+                title: "Cập nhật người dùng",
+                message: "Cập nhật người dùng thành công!",
+                position: "bottom",
+                duration: 2000,
+              });
+            }
           });
+        } catch (error) {
+          this.dialog = true;
+          this.messagePopup ="Lỗi hệ thống !";
         }
+        this.flag = true;
       }
-      this.backToList();
+
+
+      if(this.flag) {
+        this.initcachedItem();
+        this.backToList();
+      }
     },
     backToList() {
       console.log("bakc to list");
       this.$router.push({ name: "Users" });
-    }
-  }
+    },
+  },
 };
 </script>
 <style>
@@ -285,12 +359,6 @@ export default {
   display: flex;
   padding: 16px;
   /* background-color: #fafbfd; */
-}
-/* .layout {
-  align-items: end;
-} */
-.text-red {
-  color: rgb(204, 60, 60);
 }
 i.el-icon-success {
   color: #67c23a;

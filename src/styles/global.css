@@ -4,6 +4,10 @@ body {
     font-size: 15px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 .header-table__color,
 .el-table--border th {
     font-family: Lato-Bold !important;
@@ -59,4 +63,7 @@ tr.el-table__row:nth-child(even) {
 .btn-radius {
     border-radius: 4px;
     color: #fff !important;
+}
+.text-red {
+    color: rgb(204, 60, 60);
 }

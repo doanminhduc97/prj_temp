@@ -1,104 +1,59 @@
 <template>
-  <div class="app-container">
-    <v-container fluid ma-0 pa-0>
-      <div>
-        <v-card>
-          <v-card-title>
-            <h1>Thêm mới chức năng</h1>
-            <div class="border-title-header"></div>
-          </v-card-title>
-          <v-container grid-list-md>
-            <v-layout wrap align-end>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Mã chức năng <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-text-field
-                  :readonly="isEditFeature"
-                  v-model="cachedItem.maChucNang"
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Tên chức năng <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-text-field
-                  :readonly="isEditFeature"
-                  v-model="cachedItem.tenChucNang"
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Chức năng cha <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-select
-                  :items="listChucNangCha"
-                  item-value="value"
-                  v-model="cachedItem.valueChucNangCha"
-                  item-text="label"
-                ></v-select>
-              </v-flex>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Action <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-select
-                  :items="listAction"
-                  item-value="value"
-                  v-model="cachedItem.valueListAction"
-                  item-text="label"
-                ></v-select>
-              </v-flex>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Icon <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-text-field
-                  v-model="cachedItem.icon"
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-              <v-flex sm2 md2 xl2 class="pl-5">
-                <p>Thứ tự <span class="text-red">(*)</span></p>
-              </v-flex>
-              <v-flex sm4 md4 xl4>
-                <v-text-field
-                  v-model="cachedItem.thuTu"
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-flex>
-              <v-layout wrap align-center>
-                <v-flex sm2 md2 xl2 class="pl-5" align-center>
-                  <p>Ghi chú</p>
-                </v-flex>
-                <v-textarea
-                  name="input-7-4"
-                  :value="cachedItem.ghiChu"
-                ></v-textarea>
-              </v-layout>
-            </v-layout>
-            <v-layout>
-              <v-flex sm2 md2 xl2 class="pl-5" align-center>
-                <p>Hiển thị menu</p>
-              </v-flex>
-              <v-flex sm10 md10 xl10>
-                <span>{{ cachedItem.displayMenu }}</span>
-              </v-flex>
-            </v-layout>
-            <v-layout wrap>
-              <v-flex md12 class="text-md-right text-lg-right text-sm-center">
-                <v-btn color="info" class="radius-btn" @click="onClickBtnAdd()">
-                  <span>Lưu thay đổi</span>
-                </v-btn>
-                <v-btn class="radius-btn" @click="backToList">Trở về</v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card>
-      </div>
-    </v-container>
+  <div>
+    <v-card>
+      <v-card-title>
+        <h1><i class="el-icon-info"></i> Chi tiết chức năng</h1>
+        <div class="border-title-header"></div>
+      </v-card-title>
+      <v-container grid-list-md>
+        <v-layout wrap style="overflow-x: auto;">
+          <table width="100%" style="text-align: left" class="table-detail">
+            <tr style="padding: 20px 10px">
+              <th width="15%">Mã chức năng</th>
+              <td width="30%">{{ cachedItem.maChucNang }}</td>
+              <th width="15%">Tên chức năng</th>
+              <td width="30%">{{ cachedItem.tenChucNang }}</td>
+            </tr>
+            <tr>
+              <th>Chức năng cha</th>
+              <td>{{ cachedItem.valueChucNangCha }}</td>
+              <th>Action</th>
+              <td>{{ cachedItem.valueListAction }}</td>
+            </tr>
+            <tr>
+              <th>Thứ tự</th>
+              <td>{{ cachedItem.thuTu }}</td>
+              <th>icon</th>
+              <td>{{ cachedItem.icon }}</td>
+            </tr>
+            <tr>
+              <th>Hiển thị menu</th>
+              <td>
+                <i class="el-icon-error" v-if="!cachedItem.displayMenu"></i> 
+                <i class="el-icon-success" v-else></i> 
+              </td>
+              <th>Trạng Thái</th>
+              <td>
+                <i class="el-icon-error" v-if="!cachedItem.trangThai"></i> 
+                <i class="el-icon-success" v-else></i>
+              </td>
+            </tr>
+            <tr>
+              <th>Ghi chú</th>
+              <td colspan="3">{{ cachedItem.ghiChu }}</td>
+            </tr>
+          </table>
+        </v-layout>
+        <v-layout wrap>
+          <v-flex
+            md12
+            class="text-md-right text-lg-right text-sm-center theme-dark"
+          >
+            <v-btn class="radius-btn" @click="backToList()">Trở về</v-btn>
+          </v-flex>
+        </v-layout>
+      </v-container>
+    </v-card>
     <v-dialog v-model="dialog" max-width="350" max-height="300">
       <v-card>
         <v-card-title class="text-h5">
@@ -120,70 +75,88 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <loading v-if="isLoading" />
   </div>
 </template>
 <script>
 import { FeatureService } from "../../sevices/features.service";
-
+import Loading from "../../components/Loading";
 export default {
   name: "FeatureDetail",
+  components: {
+    Loading
+  },
   data() {
     return {
-      StatusItem: [true, false],
-      cachedItem: {
-        maChucNang: "",
-        tenChucNang: "",
-        icon: "",
-        thuTu: "",
-        ghiChu: "",
-        displayMenu: "",
-        valueChucNangCha: null,
-        valueListAction: null,
-      },
-      listChucNangCha: [],
-      listAction: [],
-      listGroups: [],
-      rules: {
-        required: (value) => !!value || "Không được bỏ trống!",
-      },
+      isLoading: false,
+      cachedItem: {},
       dialog: false,
-      messagePopup: "",
+      messagePopup: "Chức năng không tồn tại!"
     };
   },
   created() {
-    console.log("!@3", this.$route.params.id, this.$route.path);
-    // edit feature
-    if (this.$route.params.id && this.route.path === "/feature/edit") {
-    } else {
-      // add feature
-      FeatureService.getDropdownKey().then((res) => {
-        this.listChucNangCha = [...res.body.listDropdownKhoaChaId];
-      });
-      FeatureService.getDropdownAction().then((res) => {
-        this.listAction = [...res.body.listDropdownAction];
-      });
+    this.isLoading = true;
+    if (
+      this.$route.params.featureId &&
+      this.$route.path.includes("/detailFeature")
+    ) {
+      const featureId = this.$route.params.featureId;
+      FeatureService.getDetailFeature(featureId)
+        .then(res => {
+          console.log(res);
+          this.cachedItem = {
+            id: res.body.id,
+            maChucNang: res.body.maChucNang,
+            tenChucNang: res.body.tenChucNang,
+            icon: res.body.icon,
+            thuTu: res.body.thuTu,
+            ghiChu: res.body.ghiChu,
+            displayMenu: res.body.menu,
+            valueChucNangCha: res.body.chucNangCha.label,
+            valueListAction: res.body.action.label,
+            deleted: res.body.deleted,
+            trangThai: res.body.trangThai,
+            chiTiet: res.body.chiTiet
+          };
+        })
+        .catch(() => {
+          this.isLoading = false;
+          this.dialog = true
+        });
     }
+    this.isLoading = false;
   },
   methods: {
     backToList() {
-      this.$router.push("/features");
-    },
-    onClickBtnSave() {},
-  },
+      this.$router.push({ name: "Features" });
+    }
+  }
 };
 </script>
 <style>
-.app-container {
-  display: -webkit-flex;
-  display: flex;
-  padding: 16px;
-  /* background-color: #fafbfd; */
+.table-detail {
+  table-layout: fixed;
+  word-wrap: break-word;
+  border: 1px solid rgb(228, 228, 228);
 }
-/* .layout {
-  align-items: end;
-} */
-.text-red {
-  color: rgb(204, 60, 60);
+.table-detail,
+.table-detail th,
+.table-detail td {
+  border: 1px solid rgb(228, 228, 228);
+  border-collapse: collapse;
+  padding-left: 15px;
+  overflow: hidden;
+  height: 80px;
+}
+.table-detail th,
+.table-detail td {
+  text-align: left;
+}
+.theme-dark {
+  background-color: rgb(241, 241, 241);
+}
+.el-icon-info {
+  color: rgb(131, 130, 130);
 }
 i.el-icon-success {
   color: #67c23a;
@@ -191,13 +164,5 @@ i.el-icon-success {
 }
 i.el-icon-error {
   color: #f56c6c;
-}
-.v-text-field.v-text-field--enclosed .v-text-field__details,
-.v-text-field.v-text-field--enclosed > .v-input__control > .v-input__slot {
-  margin-top: 0;
-  max-height: 40px;
-  min-height: 40px !important;
-  display: flex !important;
-  align-items: center !important;
 }
 </style>

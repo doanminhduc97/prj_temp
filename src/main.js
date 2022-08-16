@@ -10,7 +10,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
 import Vuetify from "vuetify";
-
+import CKEditor from "@ckeditor/ckeditor5-vue2";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
 import '@mdi/font/css/materialdesignicons.css'
 import "./styles/global.css";
@@ -31,6 +31,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
+Vue.use(CKEditor);
 Vue.use(VueChartkick, { adapter: Chart });
 Vue.use(ElementUI);
 Vue.component("full-calendar", fullCalendar);

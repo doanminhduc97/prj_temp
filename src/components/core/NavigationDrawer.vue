@@ -9,7 +9,7 @@
       </router-link>
     </v-toolbar>
     <v-list>
-      <v-list-tile @click="changeRoute('Dashboard', 1)">
+      <!-- <v-list-tile @click="changeRoute('Dashboard', 1)">
         <v-list-tile-action>
           <v-icon>dashboard</v-icon>
         </v-list-tile-action>
@@ -17,7 +17,7 @@
           :class="[{ active: selectedIndex === 1 }, 'item-title']"
           >{{ $t("dashboard") }}</v-list-tile-title
         >
-      </v-list-tile>
+      </v-list-tile> -->
 
       <!-- <v-list-tile @click="changeRoute('Calendar', 2)">
         <v-list-tile-action>
@@ -71,7 +71,7 @@
         </v-list-tile>
     </v-list-group> -->
 
-      <v-list-group prepend-icon="fingerprint">
+      <!-- <v-list-group prepend-icon="fingerprint">
         <v-list-tile slot="activator">
           <v-list-tile-title class="item-title">{{
             $t("authorization")
@@ -113,7 +113,7 @@
             $t("login")
           }}</v-list-tile-title>
         </v-list-tile>
-      </v-list-group>
+      </v-list-group> -->
       <!-- Group -->
       <v-list-group prepend-icon="account_circle">
         <v-list-tile slot="activator">
@@ -166,6 +166,61 @@
             class="item-title"
             v-text="'Chức năng'"
           ></v-list-tile-title>
+        </v-list-tile>
+      </v-list-group>
+      <!-- Quan ly tia liệu -->
+      <v-list-group prepend-icon="fas fa-list">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">
+            Quản lý tài liệu
+          </v-list-tile-title>
+        </v-list-tile>
+
+        <v-list-tile @click="changeRoute('Document', 4)">
+          <v-list-tile-action>
+            <v-icon v-text="'fas fa-list'"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'Tài liệu'"
+            ></v-list-tile-title>
+        </v-list-tile>
+      </v-list-group>
+      <!-- Chuyên mục -->
+      <v-list-group prepend-icon="fas fa-list">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">
+            Quản lý chuyên mục
+          </v-list-tile-title>
+        </v-list-tile>
+
+        <v-list-tile @click="changeRoute('Categories', 5)">
+          <v-list-tile-action>
+            <v-icon v-text="'fas fa-list'"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'Chuyên mục'"
+            ></v-list-tile-title>
+        </v-list-tile>
+      </v-list-group>
+
+      <!-- Bài viết -->
+      <v-list-group prepend-icon="fas fa-list">
+        <v-list-tile slot="activator">
+          <v-list-tile-title class="item-title">
+            Quản lý Bài viết
+          </v-list-tile-title>
+        </v-list-tile>
+
+        <v-list-tile @click="changeRoute('Article', 5)">
+          <v-list-tile-action>
+            <v-icon v-text="'fas fa-list'"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title
+            class="item-title"
+            v-text="'Bài viết'"
+            ></v-list-tile-title>
         </v-list-tile>
       </v-list-group>
     </v-list>

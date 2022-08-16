@@ -173,7 +173,7 @@ export default {
           this.$notify({
             group: "notify",
             type: "success",
-            title: "Thêm mới nhóm người dùng",
+            title: "Thêm mới",
             message: "Thêm mới nhóm người dùng thành công!",
             position: "bottom",
             duration: 2000
@@ -187,7 +187,7 @@ export default {
           this.$notify({
             group: "notify",
             type: "success",
-            title: "Cập nhật nhóm người dùng",
+            title: "Cập nhật",
             message: "Cập nhật nhóm người dùng thành công!",
             position: "bottom",
             duration: 2000

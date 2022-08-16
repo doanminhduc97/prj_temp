@@ -6,24 +6,24 @@
           <h1>Danh sách người dùng</h1>
         </v-card-title>
         <v-card-title>
-            <template>
-              <div class="d-flex justify-end">
-                <div>
-                  <v-btn
-                    color="primary"
-                    dark
-                    class="ml-auto ma-3 btn-add"
-                    @click="onClickBtn()"
-                    style="width: 100px"
+          <template>
+            <div class="d-flex justify-end">
+              <div>
+                <v-btn
+                  color="primary"
+                  dark
+                  class="ml-auto ma-3 btn-add"
+                  @click="onClickBtn()"
+                  style="width: 100px"
+                >
+                  Thêm mới
+                  <v-icon small style="padding-left: 5px"
+                    >mdi-plus-circle-outline</v-icon
                   >
-                    Thêm mới
-                    <v-icon small style="padding-left: 5px"
-                      >mdi-plus-circle-outline</v-icon
-                    >
-                  </v-btn>
-                </div>
+                </v-btn>
               </div>
-            </template>
+            </div>
+          </template>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
@@ -41,7 +41,14 @@
           style="padding: 18px; padding-left: 32px"
         >
           <template slot="items" slot-scope="props">
-            <td class="text-xs-left color-content">{{ props.item.id }}</td>
+            <td class="text-xs-left color-content">
+              <span
+                style="text-decoration: underline; color: blue; cursor: pointer"
+                @click="goToDetail(props.item.id)"
+              >
+                {{ props.item.id }}
+              </span>
+            </td>
             <td class="text-xs-left">{{ props.item.maNguoiDung }}</td>
             <td class="text-xs-left">{{ props.item.taiKhoan }}</td>
             <td class="text-xs-left">{{ props.item.hoTen }}</td>
@@ -53,23 +60,27 @@
               {{ moment(props.item.ngayTao).format("YYYY-MM-DD") || "" }}
             </td>
             <td class="text-xs-left">
-               <i class="el-icon-error" v-if="!props.item.trangThai"></i> 
-               <i class="el-icon-success" v-else></i> 
+              <i class="el-icon-error" v-if="!props.item.trangThai"></i>
+              <i class="el-icon-success" v-else></i>
             </td>
             <td class="text-xs-left">
-              <i class="el-icon-error" v-if="!props.item.admin"></i> 
-               <i class="el-icon-success" v-else></i>
+              <i class="el-icon-error" v-if="!props.item.admin"></i>
+              <i class="el-icon-success" v-else></i>
             </td>
             <td class="d-flex justify-center">
               <v-icon
                 small
                 class="mr-2"
-                @click="onClickBtn(props.item.maNguoiDung)"
+                @click="onClickBtn(props.item.id)"
                 color="primary"
               >
                 mdi-pencil
               </v-icon>
-              <v-icon small @click="confirmDeleteItem(props.item.maNguoiDung)" color="pink">
+              <v-icon
+                small
+                @click="confirmDeleteItem(props.item)"
+                color="pink"
+              >
                 mdi-delete
               </v-icon>
             </td>
@@ -179,54 +190,47 @@ export default {
       StatusItem: [true, false],
       isUpdateClick: false,
       dialogDel: false,
-      titleDialog: "Are you sure you want to delete the user?",
+      titleDialog: "Bạn có chắc chắn muốn xóa ?",
       lstGroups: []
     };
   },
   async mounted() {
-    console.log("test", localStorage.getItem("userInfo"));
     this.loadItems();
     let list = [...this.$store.getters["groups/getGroups"]];
 
     list.forEach(item => {
       this.lstGroups.push(item.tenNhomNguoiDung);
     });
-    console.log("this.lstGroups", this.lstGroups);
   },
   methods: {
     initcachedItem() {
       this.cachedItem = {
         userId: "",
-        // groupsName: "",
         account: "",
-        // password: "",
         name: "",
         email: "",
         phone: "",
-        // note: "",
-        // userCreate: JSON.parse(localStorage.getItem("userInfo")).hoTen,
         admin: false
       };
     },
-    async loadItems() {
+    loadItems() {
       this.listUsers = [];
       try {
-        const res = await UsersService.getListUsers();
-        if (res.success) {
-          this.listUsers = res.body.lstQtNguoiDung;
-          console.log("this.listUsers", this.listUsers);
-        }
+        UsersService.getListUsers().then(res => {
+          if (res.success) {
+            this.listUsers = res.body.lstQtNguoiDung;
+          }
+        })
       } catch (error) {
         console.log(error);
       }
     },
     onClickBtn(userId) {
-      console.log('ddddd', userId)
       if (!userId) {
-        this.$router.push({ name: "AddUser" })
-        return
+        this.$router.push({ name: "AddUser" });
+        return;
       }
-      this.$router.push({ name: "UpdateUser", params: { userId: userId } })
+      this.$router.push({ name: "UpdateUser", params: { userId: userId } });
     },
     confirmDeleteItem(item) {
       this.cachedItem = item;
@@ -234,15 +238,33 @@ export default {
     },
     async deleteUserGroup(flag) {
       if (flag) {
-        const res = await UsersService.deleteUserById({
-          id: this.cachedItem.id
-        });
-        if (res) {
-          this.initcachedItem();
-          this.loadItems();
+        try {
+          const res = await UsersService.deleteUserById({id: this.cachedItem.id});
+          if (res) {
+            this.$notify({
+              type: "success",
+              title: "Xóa",
+              message: "Xóa người dùng thành công !",
+              position: "bottom right",
+              duration: 2000
+            });
+            this.initcachedItem();
+            this.loadItems();
+          }
+        } catch (error) {
+          this.$notify({
+              type: "error",
+              title: "Xóa",
+              message: "Xóa người dùng thất bại !",
+              position: "bottom right",
+              duration: 2000
+            });
         }
       }
       this.dialogDel = false;
+    },
+    goToDetail(id) {
+      this.$router.push({ path: `/users/${id}` });
     }
   }
 };

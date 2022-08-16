@@ -90,10 +90,21 @@ export class FeatureService {
     static async addFeature(body) {
         try {
             const requestBody = {...body };
-            const res = await axios.post(`/temproject/api/v1/chucnang/update`, requestBody);
+            const res = await axios.post(`/temproject/api/v1/chucnang/add`, requestBody);
             return response.create(res, HTTP_STATUS.CREATED);
         } catch (error) {
             throw new error;
         }
-    }    
+    }
+
+    static async checkExistsFeatureId(body) {
+        try {
+            const requestBody = {...body };
+            const res = await axios.get(`/temproject/api/v1/chucnang/checkcode`, requestBody);
+            return response.create(res, HTTP_STATUS.CREATED);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
 }

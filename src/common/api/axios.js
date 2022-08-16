@@ -35,7 +35,9 @@ const onSuccess = res => {
 
 const onError = err => {
     if (err.response.status == HTTP_STATUS_UNAUTHORIZED || err.response.status == HTTP_STATUS_FORBIDDEN) {
-        window.location.href = "login";
+        if (window.location.pathname !== "/login") {
+            window.location.href = "/login";
+        }
         // router.push("/login")
     }
     throw new Error(err);

@@ -16,7 +16,6 @@
                 color="primary"
                 dark
                 class="ml-auto ma-3 btn-radius"
-                v-on="on"
                 style="width: 100px"
                 @click="onClickNewFeature"
               >
@@ -46,22 +45,31 @@
               'border-top-left-radius': '10px',
             }"
             border
+            sortable
           >
-            <el-table-column prop="id" label="ID" align="center" width="70">
+            <el-table-column prop="id" label="ID" align="center">
             </el-table-column>
             <el-table-column
-              prop="tenChucNang"
               label="Tên chức năng"
               header-align="center"
               align="left"
               width="400"
+              sortable
+              class-name="el-column-link"
             >
+              <template slot-scope="props">
+                <span class="hoverId"
+                @click="handleRowClick(props.row.id)">
+                  {{ props.row.tenChucNang }}
+                </span>
+              </template>
             </el-table-column>
             <el-table-column
               prop="action"
               label="Action"
               header-align="center"
               align="left"
+              sortable
             >
             </el-table-column>
             <el-table-column
@@ -88,7 +96,7 @@
                 <v-icon
                   small
                   class="mr-2"
-                  @click="editFeature(scope.row)"
+                  @click="editFeature(scope.row.id)"
                   color="primary"
                 >
                   mdi-pencil
@@ -181,16 +189,14 @@ export default {
     },
   },
   methods: {
-    editFeature(item) {
-      console.log("item", item);
+    editFeature(id) {
+      this.$router.push({ name: "UpdateFeature", params: { featureId: id } });
     },
     async loadItems() {
       this.listFeature = [];
       try {
         this.listFeature = await FeatureService.getListFeatures();
-        console.log("this.listFeature", this.listFeature);
         this.tableData = util.deepClone(this.listFeature.body.listChucNang);
-        console.log("table data", this.tableData);
       } catch (error) {
         console.log(error);
       }
@@ -203,7 +209,7 @@ export default {
       if (flag && this.idItem) {
         try {
           this.isLoading = true;
-          const res = await GroupsService.deleteGroupById({
+          const res = await FeatureService.deleteFeature({
             id: this.idItem,
           });
           if (res) {
@@ -212,16 +218,16 @@ export default {
           }
           this.$notify({
             type: "success",
-            title: "Info",
-            message: "Delete Feature success!",
+            title: "Xóa",
+            message: "Xóa chức năng thành công!",
             position: "bottom right",
             duration: 2000,
           });
         } catch (error) {
           this.$notify({
             type: "error",
-            title: "Delete Feature",
-            text: "Delete Feature Failed!",
+            title: "Xóa",
+            message: "Xóa chức năng thất bại!",
             position: "bottom right",
             duration: 2000,
           });
@@ -238,6 +244,9 @@ export default {
       console.log("=======redirect to new page==========");
       this.$router.push({ path: `/feature/add` });
     },
+    handleRowClick(id) {
+      this.$router.push({ name:"FeatureDetail", params: { featureId: id } });
+    }
   },
 };
 </script>
@@ -251,5 +260,9 @@ i.el-icon-success {
 }
 i.el-icon-error {
   color: #f56c6c;
+}
+.el-column-link {
+  text-decoration: underline;
+  cursor: pointer;
 }
 </style>

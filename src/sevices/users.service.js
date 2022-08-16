@@ -47,11 +47,58 @@ export class UsersService {
         }
     }
 
-    static async getUserById(param = {}) {
+    static async getUserById(id) {
         try {
-            const sMaNguoiDung = param.sMaNguoiDung
-            const res = await axios.get(`/temproject/api/v1/nguoidung/list`, { sMaNguoiDung: sMaNguoiDung });
+            const res = await axios.get(`/temproject/api/v1/nguoidung/detail/${id}`);
             return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
+    static async getUserDetail(id) {
+        try {
+            const res = await axios.get(`/temproject/api/v1/nguoidung/detail/${id}`);
+            return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
+    static async checkUserId(body) {
+        try {
+            const requestBody = {...body };
+            const res = await axios.get(`/temproject/api/v1/nguoidung/checkcode`, requestBody);
+            return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
+    static async checkUserName(body) {
+        try {
+            const requestBody = {...body };
+            const res = await axios.get(`/temproject/api/v1/nguoidung/checkusername`, requestBody);
+            return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
+    static async getDetailUser({id}) {
+        try {
+            const res = await axios.get(`/temproject/api/v1/nguoidung/detail/${id}`);
+            return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+
+    static async updateRoleUser(body) {
+        try {
+            const requestBody = {...body };
+            const res = await axios.patch(`/temproject/api/v1/nguoidung/phanquyen/`, requestBody);
+            return response.create(res, HTTP_STATUS.ACCEPTED);
         } catch (error) {
             throw new error;
         }

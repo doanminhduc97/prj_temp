@@ -37,10 +37,20 @@ export class GroupsService {
         }
     }
 
-    static async getGroupById(id) {
+    static async getGroupById({ id }) {
         try {
             const res = await axios.get(`/temproject/api/v1/nhomnguoidung/detail/${id}`);
             return response.create(res, HTTP_STATUS.OK);
+        } catch (error) {
+            throw new error;
+        }
+    }
+    
+    static async updateRoleGroup(body) {
+        try {
+            const requestBody = {...body };
+            const res = await axios.patch(`/temproject/api/v1/nhomnguoidung/phanquyen/`, requestBody);
+            return response.create(res, HTTP_STATUS.ACCEPTED);
         } catch (error) {
             throw new error;
         }

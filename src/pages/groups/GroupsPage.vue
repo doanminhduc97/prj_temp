@@ -46,7 +46,13 @@
             }"
             border
           >
-            <el-table-column prop="id" label="ID" align="center">
+            <el-table-column label="ID" align="center">
+              <template slot-scope="props">
+                <span class="hoverId"
+                @click="goToDetail(props.row.id)">
+                  {{ props.row.id }}
+                </span>
+              </template>
             </el-table-column>
             <el-table-column
               prop="maNhomNguoiDung"
@@ -82,7 +88,7 @@
             >
               <template slot-scope="scope">
                 <span>{{
-                  moment(scope.row.ngayCapNhat).format("YYYY-MM-DD")
+                  moment(scope.row.ngayTao).format("YYYY-MM-DD")
                 }}</span>
               </template>
             </el-table-column>
@@ -101,7 +107,7 @@
             >
               <template slot-scope="scope">
                 <span>{{
-                  moment(scope.row.ngayTao).format("YYYY-MM-DD")
+                  moment(scope.row.ngayCapNhat).format("YYYY-MM-DD")
                 }}</span>
               </template>
             </el-table-column>
@@ -191,7 +197,7 @@ export default {
       pagination: {
         rowsPerPage: 10
       },
-      titleDialog: "Are you sure you want to delete the group?",
+      titleDialog: "Bạn có chắc chắn muốn xóa ?",
       expand: true,
       isLoading: false,
       tableData: [],
@@ -220,30 +226,10 @@ export default {
   },
   watch: {
     tableDataFilter(newValue) {
-      console.log("new", newValue);
-      // this.tableData = newValue;
+      console.log("tableDataFilter", newValue);
     }
   },
   methods: {
-    showEditDialog(item, type = "") {
-      // this.cachedItem = item || {};
-      console.log("item", item);
-      if (item && type === "update") {
-        console.log("update");
-        this.cachedItem.id = item.id || null;
-        this.cachedItem.maNhomNguoiDung = item.maNhomNguoiDung || "";
-        this.cachedItem.tenNhomNguoiDung = item.tenNhomNguoiDung || "";
-        this.cachedItem.ghiChu = item.ghiChu || "";
-        this.cachedItem.khoaChaId = item.khoaChaId || "";
-        this.cachedItem.trangThai = item.trangThai || false;
-        this.isUpdateClick = true;
-      } else {
-        console.log("not update");
-        this.initcachedItem();
-        this.isUpdateClick = false;
-      }
-      this.dialog = !this.dialog;
-    },
     initcachedItem() {
       this.cachedItem = {
         id: "",
@@ -263,90 +249,6 @@ export default {
         console.log(error);
       }
     },
-    async saveItem(item, type = "") {
-      this.isLoading = true;
-      try {
-        switch (type) {
-          case "create":
-            const requestBody = {
-              maNhomNguoiDung: item.maNhomNguoiDung,
-              tenNhomNguoiDung: item.tenNhomNguoiDung,
-              ghiChu: item.ghiChu,
-              khoaChaId: item.khoaChaId,
-              trangThai: item.trangThai
-            };
-            await GroupsService.addGroup(requestBody)
-              .then(() => {
-                this.loadItems();
-                this.initcachedItem();
-                this.$notify({
-                  group: "notify",
-                  type: "success",
-                  title: "Create Group",
-                  message: "Create Group success!",
-                  position: "bottom",
-                  duration: 2000
-                });
-                this.dialog = !this.dialog;
-              })
-              .catch(error => {
-                this.$notify({
-                  group: "notify",
-                  type: "error",
-                  title: "Create Group",
-                  message: "Create Group Failed!",
-                  position: "bottom",
-                  duration: 2000
-                });
-                return null;
-              });
-
-            break;
-          case "update":
-            console.log("id", item.id);
-            const updateGroup = {
-              id: item.id,
-              maNhomNguoiDung: item.maNhomNguoiDung,
-              tenNhomNguoiDung: item.tenNhomNguoiDung,
-              ghiChu: item.ghiChu,
-              khoaChaId: item.khoaChaId,
-              trangThai: item.trangThai
-            };
-            await GroupsService.updateGroup(updateGroup)
-              .then(() => {
-                this.loadItems();
-                this.initcachedItem();
-                this.$notify({
-                  group: "notify",
-                  type: "success",
-                  title: "Update Group",
-                  message: "Update Group success!",
-                  position: "bottom right",
-                  duration: 2000
-                });
-                this.dialog = !this.dialog;
-              })
-              .catch(err => {
-                this.$notify({
-                  group: "notify",
-                  type: "error",
-                  title: "Update Group",
-                  message: "Update Group Failed!",
-                  position: "bottom right",
-                  duration: 2000
-                });
-                return null;
-              });
-
-            break;
-          default:
-            break;
-        }
-      } catch (error) {
-        console.log("save error", error);
-      }
-      this.isLoading = false;
-    },
     confirmDeleteItem(item) {
       this.cachedItem = item;
       this.dialogDel = true;
@@ -364,16 +266,16 @@ export default {
           }
           this.$notify({
             type: "success",
-            title: "Info",
-            message: "Delete Group success!",
+            title: "Xóa",
+            message: "Xóa nhóm người dùng thành công !",
             position: "bottom right",
             duration: 2000
           });
         } catch (error) {
           this.$notify({
             type: "error",
-            title: "Delete Group",
-            text: "Delete Group Failed!",
+            title: "Xóa",
+            message: "Xóa nhóm người dùng thất bại !",
             position: "bottom right",
             duration: 2000
           });
@@ -393,6 +295,9 @@ export default {
       }
       this.$router.push({ name: "UpdateGroup", params: { groupId: groupId } })
     },
+    goToDetail(id) {
+      this.$router.push({ path: `/groups/${id}` });
+    }
   }
 };
 </script>
@@ -406,5 +311,9 @@ i.el-icon-success {
 }
 i.el-icon-error {
   color: #f56c6c;
+}
+.hoverId {
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>
