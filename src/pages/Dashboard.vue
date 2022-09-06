@@ -1,6 +1,7 @@
 <template>
   <v-container fluid grid-list-xl>
     <v-layout row wrap>
+      <v-row>
         <v-btn @click="dialogVisible = true" color="info">Add Chart</v-btn>
         <!-- <el-dialog :visible.sync="dialogVisible"> -->
         <el-dialog
@@ -87,76 +88,81 @@
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">Close</el-button>
-            <el-button type="primary" v-if="!form.id" @click="addNewChart">Create</el-button>
-            <el-button type="primary" v-else @click="updateChart">Update</el-button>
+            <el-button type="primary" @click="addNewChart">create</el-button>
           </div>
         </el-dialog>
+      </v-row>
     </v-layout>
-    <v-layout row wrap>
-      <!-- Widgets Ends -->
-      <!-- Statistics -->
-      <draggable
-        :list="listChart"
-        :animation="200"
-        ghost-class="moving-card"
-        group="listChart"
-        filter=".action-button"
-        class="row"
-        style="display: flex; flex-wrap: wrap"
+    <div>
+      <grid-layout
+        :layout.sync="layout"
+        :col-num="6"
+        :rowHeight="360"
+        :is-draggable="true"
+        :is-resizable="true"
+        :is-mirrored="false"
+        :vertical-compact="true"
+        :margin="[10, 10]"
+        :use-css-transforms="true"
       >
-        <v-flex d-flex v-for="(item, index) in listChart" :key="index">
-          <!-- <site-view-statistic /> -->
-          <v-card class="card">
-            <v-card-text class="pa-2">
-              <span class="icon-settings">
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-icon
-                        large
-                        class="mr-2"
-                        color="primary"
-                        v-bind="attrs"
-                        v-on="on"
-                        @click="showDialogUpdateChart(item)"
-                      >
-                        mdi-cog
-                      </v-icon>
-                    </template>
-                    <span>Settings</span>
-                  </v-tooltip>
-              </span>
-              <template v-if="item.type === 'pie'">
-                <pie-chart
-                  :data="item.data"
-                  legend="right"
-                  :donut="true"
-                  class="chart"
-                ></pie-chart>
-              </template>
-              <template v-else-if="item.type === 'line'">
-                <line-chart
-                  :data="item.data"
-                  :colors="['#8b47d8']"
-                  :xtitle="item.xtitle"
-                  :ytitle="item.ytitle"
-                  :dataset="{ borderWidth: 3 }"
-                  class="chart"
-                ></line-chart>
-              </template>
-            </v-card-text>
-          </v-card>
-        </v-flex>
-      </draggable>
-    </v-layout>
+        <grid-item
+          v-for="item in layout"
+          :x.sync="item.x"
+          :y.sync="item.y"
+          :w.sync="item.w"
+          :h.sync="item.h"
+          :i="item.i"
+          :key="item.i"
+          @resized="resizedEvent"
+          class="chart-item"
+        >
+          <div v-if="item.chart">
+            <Highcharts
+              :options="options"
+              :style="{ width: item.width + 'px', height: item.height + 'px' }"
+              :autoresize="true"
+            />
+          </div>
+        </grid-item>
+      </grid-layout>
+    </div>
   </v-container>
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import Highcharts from "highcharts";
+import loadMap from "highcharts/modules/map.js";
+import { genComponent } from "vue-highcharts";
+import loadStock from "highcharts/modules/stock.js";
+import loadGantt from "highcharts/modules/gantt.js";
+import loadDrilldown from "highcharts/modules/drilldown.js";
+import loadHighchartsMore from "highcharts/highcharts-more.js";
+import loadSolidGauge from "highcharts/modules/solid-gauge.js";
+import VueGridLayout from "vue-grid-layout";
+
+loadStock(Highcharts);
+loadMap(Highcharts);
+loadGantt(Highcharts);
+loadDrilldown(Highcharts);
+loadHighchartsMore(Highcharts);
+loadSolidGauge(Highcharts);
+// loadMap(Highcharts);
+var testLayout = [
+  { x: 0, y: 0, w: 2, h: 1, i: "0", width: "350", height: "350" },
+  { x: 2, y: 0, w: 2, h: 1, i: "1", width: "350", height: "350" },
+  { x: 4, y: 0, w: 2, h: 1, i: "2", width: "350", height: "350" },
+  { x: 0, y: 3, w: 2, h: 1, i: "3", width: "350", height: "350" },
+  { x: 2, y: 5, w: 2, h: 1, i: "4", width: "350", height: "350" },
+  { x: 4, y: 6, w: 2, h: 1, i: "5", width: "350", height: "350" },
+  { x: 0, y: 6, w: 2, h: 1, i: "6", width: "350", height: "350" },
+];
 export default {
   name: "Dashboard",
   components: {
-    draggable,
+    Highcharts: genComponent("Highcharts", Highcharts),
+    Highmaps: genComponent("Highmaps", Highcharts),
+    GridLayout: VueGridLayout.GridLayout,
+    GridItem: VueGridLayout.GridItem,
   },
   data() {
     return {
@@ -174,9 +180,108 @@ export default {
       titleErrorArr: [],
       listChart: [],
       countIndex: 0,
+      layout: testLayout.map((i) => ({ ...i, chart: true })),
+      options: {
+        title: {
+          text: "Monthly Average Temperature",
+          x: -20, //center
+        },
+        subtitle: {
+          text: "Source: WorldClimate.com",
+          x: -20,
+        },
+        xAxis: {
+          categories: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+        },
+        yAxis: {
+          title: {
+            text: "Temperature (°C)",
+          },
+          plotLines: [
+            {
+              value: 0,
+              width: 1,
+              color: "#808080",
+            },
+          ],
+        },
+        tooltip: {
+          valueSuffix: "°C",
+        },
+        legend: {
+          layout: "vertical",
+          align: "right",
+          verticalAlign: "middle",
+          borderWidth: 0,
+        },
+        series: [
+          {
+            type: "pie",
+            name: "Tokyo",
+            data: [
+              7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9,
+              9.6,
+            ],
+          },
+          {
+            name: "New York",
+            data: [
+              -0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6,
+              2.5,
+            ],
+          },
+          {
+            name: "Berlin",
+            data: [
+              -0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0,
+            ],
+          },
+          {
+            name: "London",
+            data: [
+              3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,
+            ],
+          },
+        ],
+      },
     };
   },
   methods: {
+    resizedEvent(i, newH, newW, newHPx, newWPx) {
+      this.layout = this.layout.map((item) => {
+        if (item.i === i) {
+          console.log(item.width);
+          console.log(item.height);
+          item.width = newWPx;
+          item.height = newHPx;
+          item.chart = false;
+        }
+        return item;
+      });
+      setTimeout(() => {
+        this.layout = this.layout.map((item) => {
+          if (item.i === i) {
+            item.width = newWPx;
+            item.height = newHPx;
+            item.chart = true;
+          }
+          return item;
+        });
+      }, 100);
+    },
     initForm() {
       this.form = {
         type: "pie",
@@ -200,9 +305,8 @@ export default {
     addNewChart() {
       this.idErrorArr = [];
       this.titleErrorArr = [];
-      // this.countIndex++;
+      this.countIndex++;
       this.form.listData.forEach((item, index) => {
-        console.log(item.modelData, item.modelSeries, "item");
         if (item.modelSeries === 0) {
           this.idErrorArr.push(index);
         }
@@ -216,7 +320,7 @@ export default {
               this.listChart.push({
                 type: "pie",
                 data: this.dataChartPie,
-                id: Date.now(),
+                id: this.countIndex,
               });
               this.dataChartPie = [];
             }
@@ -227,7 +331,7 @@ export default {
             if (index == this.form.listData.length - 1) {
               this.listChart.push({
                 type: "line",
-                id: Date.now(),
+                id: this.countIndex,
                 data: this.datalineChart,
                 xtitle: this.form.xtitle,
                 ytitle: this.form.ytitle,
@@ -239,49 +343,22 @@ export default {
             break;
         }
       });
-      console.log("list", this.listChart);
       this.initForm();
       if (this.idErrorArr.length > 0 || this.titleErrorArr.length > 0) {
         return;
       }
       this.dialogVisible = false;
     },
-    showDialogUpdateChart(item) {
-      console.log("update", item);
-      if (item.type === 'pie') {
-        this.form.type = 'pie';
-      } else if (item.type === 'line') {
-        console.log("vào đây iffff lese", item.type);
-        this.form.type = 'line';
-        this.form.xtitle = item.xtitle;
-        this.form.ytitle = item.ytitle;
-      }
-      console.log("filter", this.form);
-      this.form.id = item.id;
-      this.form.listData = [];
-      item.data.forEach(el => {
-        this.form.listData.push({
-          modelData: el[0],
-          modelSeries: el[1]
-        });
-      });
-      this.dialogVisible = true;
-      console.log("log chart", this.listChart);
+    isNumber(value) {
+      return typeof value === "number" && isFinite(value);
     },
-    updateChart() {
-      console.log(this.form, this.listChart);
-      let infoChart = this.listChart.find(element => element.id = this.form.id);
-      console.log("item update", infoChart);
-      // infoChart.data = [];
-      // this.form.listData.forEach(item => {
-      //   infoChart.data.push([item.modelData, item.modelSeries])
-      // });
-      // if (infoChart.type === 'line') {
-      //   infoChart.xtitle = this.form.xtitle;
-      //   infoChart.ytitle = this.form.ytitle;
-      // }
-      // this.initForm();
-      // this.dialogVisible = false;
+
+    isNumberObject(n) {
+      return Object.prototype.toString.apply(n) === "[object Number]";
+    },
+
+    isCustomNumber(n) {
+      return this.isNumber(n) || this.isNumberObject(n);
     },
   },
 };
@@ -311,12 +388,121 @@ export default {
   background: #f7fafc;
   border: 1px solid #4299e1;
 }
-.icon-settings {
-  display: block;
-  text-align: right;
-}
-.chart {
-  position: relative;
-  top: -16px;
-}
 </style>
+
+<style>
+body {
+  background-color: #fafbfc;
+}
+
+.highchart {
+  width: 100%;
+  height: 300px; /* or e.g. 400px */
+}
+#app {
+  max-width: 1170px;
+  margin: auto;
+}
+#content {
+  width: 100%;
+}
+
+.vue-grid-layout {
+  /* background: #eee; */
+}
+
+.layoutJSON {
+  background: #ddd;
+  border: 1px solid black;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.eventsJSON {
+  background: #ddd;
+  border: 1px solid black;
+  margin-top: 10px;
+  padding: 10px;
+  height: 100px;
+  overflow-y: scroll;
+}
+
+.columns {
+  -moz-columns: 120px;
+  -webkit-columns: 120px;
+  columns: 120px;
+}
+
+.vue-grid-item:not(.vue-grid-placeholder) {
+  /* background: #ccc; */
+  /* border: 1px solid black; */
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-shadow: 0 0 40px hsla(0, 0%, 88.6%, 0.5);
+}
+.vue-grid-item.vue-grid-placeholder {
+  background-color: #cccccc;
+  border-radius: 5px;
+}
+.vue-grid-item.resizing {
+  opacity: 0.9;
+}
+
+.vue-grid-item.static {
+  background: #cce;
+}
+
+.vue-grid-item {
+  /* display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  text-transform: capitalize;
+  font-family: sans-serif; */
+}
+.vue-grid-item .text {
+  font-size: 24px;
+  text-align: center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.vue-grid-item .no-drag {
+  height: 100%;
+  width: 100%;
+}
+.vue-grid-item.vue-draggable-dragging {
+  box-shadow: 0 0 20px hsla(0, 0%, 0%, 0.5);
+}
+
+.vue-grid-item .minMax {
+  font-size: 12px;
+}
+
+.vue-grid-item .add {
+  cursor: pointer;
+}
+
+/* .vue-draggable-handle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 0;
+    left: 0;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'>
+    <circle cx='5' cy='5' r='5' fill='#999999'/></svg>") no-repeat;
+    background-position: bottom right;
+    padding: 0 8px 8px 0;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+    box-sizing: border-box;
+    cursor: pointer;
+} */
+</style>
+
