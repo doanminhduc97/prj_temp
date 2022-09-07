@@ -1,8 +1,7 @@
 <template>
   <v-container fluid grid-list-xl>
     <v-layout row wrap>
-      <v-row>
-        <v-btn @click="dialogVisible = true" color="info">Add Chart</v-btn>
+        <v-btn @click="openPopup('create')" color="info">Add Chart</v-btn>
         <!-- <el-dialog :visible.sync="dialogVisible"> -->
         <el-dialog
           :visible="dialogVisible"
@@ -52,7 +51,7 @@
                   <v-flex d-flex lg4 sm6 xs12>
                     <div>
                       <el-input
-                        v-model="item.modelData"
+                        v-model="item.name"
                         placeholder="data input"
                         style="width: 200px"
                       ></el-input>
@@ -65,7 +64,7 @@
                     <div>
                       <el-input-number
                         style="padding-left: 20px"
-                        v-model="item.modelSeries"
+                        v-model="item.y"
                         controls-position="right"
                         placeholder="nhap so"
                       ></el-input-number>
@@ -87,11 +86,10 @@
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">Close</el-button>
-            <el-button type="primary" @click="addNewChart">create</el-button>
+            <el-button @click="closePopup">Close</el-button>
+            <el-button type="primary" @click="clickBtnSubmit">{{ typeAction === 'create' ? 'Create' : 'Update'}}</el-button>
           </div>
         </el-dialog>
-      </v-row>
     </v-layout>
     <div>
       <grid-layout
@@ -117,11 +115,15 @@
           class="chart-item"
         >
           <div v-if="item.chart">
-            <Highcharts
-              :options="options"
-              :style="{ width: item.width + 'px', height: item.height + 'px' }"
-              :autoresize="true"
-            />
+              <span class="icon-settings">
+                <v-icon small style="padding-left: 5px" @click="openPopup('update', item)">mdi-cog</v-icon>
+              </span>
+              <Highcharts
+              ref="highChart"
+                :options="item.options"
+                :style="{ width: item.width + 'px', height: item.height + 'px' }"
+                :autoresize="true"
+              />
           </div>
         </grid-item>
       </grid-layout>
@@ -148,13 +150,13 @@ loadHighchartsMore(Highcharts);
 loadSolidGauge(Highcharts);
 // loadMap(Highcharts);
 var testLayout = [
-  { x: 0, y: 0, w: 2, h: 1, i: "0", width: "350", height: "350" },
-  { x: 2, y: 0, w: 2, h: 1, i: "1", width: "350", height: "350" },
-  { x: 4, y: 0, w: 2, h: 1, i: "2", width: "350", height: "350" },
-  { x: 0, y: 3, w: 2, h: 1, i: "3", width: "350", height: "350" },
-  { x: 2, y: 5, w: 2, h: 1, i: "4", width: "350", height: "350" },
-  { x: 4, y: 6, w: 2, h: 1, i: "5", width: "350", height: "350" },
-  { x: 0, y: 6, w: 2, h: 1, i: "6", width: "350", height: "350" },
+  // { x: 0, y: 0, w: 2, h: 1, i: "0", width: "350", height: "350" },
+  // { x: 2, y: 0, w: 2, h: 1, i: "1", width: "350", height: "350" },
+  // { x: 4, y: 0, w: 2, h: 1, i: "2", width: "350", height: "350" },
+  // { x: 0, y: 3, w: 2, h: 1, i: "3", width: "350", height: "350" },
+  // { x: 2, y: 5, w: 2, h: 1, i: "4", width: "350", height: "350" },
+  // { x: 4, y: 6, w: 2, h: 1, i: "5", width: "350", height: "350" },
+  // { x: 0, y: 6, w: 2, h: 1, i: "6", width: "350", height: "350" },
 ];
 export default {
   name: "Dashboard",
@@ -174,14 +176,19 @@ export default {
         ytitle: "",
         listData: [],
       },
+      typeAction: 'create',
+      idItemUpdate: null,
       dataChartPie: [],
       datalineChart: [],
       idErrorArr: [],
       titleErrorArr: [],
       listChart: [],
       countIndex: 0,
-      layout: testLayout.map((i) => ({ ...i, chart: true })),
+      indexChart: 0,
+      // layout: testLayout.map((i) => ({ ...i, chart: true, options: [] })),
+      layout: [],
       options: {
+        colors: ['#01BAF2', '#f6fa4b', '#FAA74B', '#baf201', '#f201ba'],
         title: {
           text: "Monthly Average Temperature",
           x: -20, //center
@@ -190,36 +197,36 @@ export default {
           text: "Source: WorldClimate.com",
           x: -20,
         },
-        xAxis: {
-          categories: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ],
-        },
-        yAxis: {
-          title: {
-            text: "Temperature (°C)",
-          },
-          plotLines: [
-            {
-              value: 0,
-              width: 1,
-              color: "#808080",
-            },
-          ],
-        },
+        // xAxis: {
+        //   categories: [
+        //     "Jan",
+        //     "Feb",
+        //     "Mar",
+        //     "Apr",
+        //     "May",
+        //     "Jun",
+        //     "Jul",
+        //     "Aug",
+        //     "Sep",
+        //     "Oct",
+        //     "Nov",
+        //     "Dec",
+        //   ],
+        // },
+        // yAxis: {
+        //   title: {
+        //     text: "Temperature (°C)",
+        //   },
+        //   plotLines: [
+        //     {
+        //       value: 0,
+        //       width: 1,
+        //       color: "#808080",
+        //     },
+        //   ],
+        // },
         tooltip: {
-          valueSuffix: "°C",
+          valueSuffix: "%",
         },
         legend: {
           layout: "vertical",
@@ -227,34 +234,114 @@ export default {
           verticalAlign: "middle",
           borderWidth: 0,
         },
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}: {point.percentage:.1f}%'
+            },
+            showInLegend: true
+          }
+        },
         series: [
+          // {
+          //   type: "line",
+          //   name: "Tokyo",
+          //   data: [
+          //       {
+          //           name: 'Water',
+          //           y: 55.02
+          //       },
+          //       {
+          //           name: 'Fat',
+          //           // sliced: true,
+          //           // selected: true,
+          //           y: 26.71
+          //       },
+          //       {
+          //           name: 'Carbohydrates',
+          //           y: 1.09
+          //       },
+          //       {
+          //           name: 'Protein',
+          //           y: 15.5
+          //       },
+          //       {
+          //           name: 'Ash',
+          //           y: 1.68
+          //       }
+          //   ]
+          // },
+          // {
+          //   type: "line",
+          //   name: "USA",
+          //   data: [
+          //       {
+          //           name: 'Water',
+          //           y: 78.02
+          //       },
+          //       {
+          //           name: 'Fat',
+          //           // sliced: true,
+          //           // selected: true,
+          //           y: 12.71
+          //       },
+          //       {
+          //           name: 'Carbohydrates',
+          //           y: 14.09
+          //       },
+          //       {
+          //           name: 'Protein',
+          //           y: 22.5
+          //       },
+          //       {
+          //           name: 'Ash',
+          //           y: 1.68
+          //       }
+          //   ]
+          // },
           {
             type: "pie",
-            name: "Tokyo",
-            data: [
-              7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9,
-              9.6,
-            ],
-          },
-          {
             name: "New York",
             data: [
-              -0.2, 0.8, 5.7, 11.3, 17.0, 22.0, 24.8, 24.1, 20.1, 14.1, 8.6,
-              2.5,
+              {
+                name: 'Water',
+                y: 55.02
+              },
+              {
+                name: 'Fat',
+                // sliced: true,
+                // selected: true,
+                y: 26.71
+              },
+              {
+                name: 'Carbohydrates',
+                y: 1.09
+              },
+              {
+                name: 'Protein',
+                y: 15.5
+              },
+              {
+                name: 'Ash',
+                y: 1.68
+              }
             ],
           },
-          {
-            name: "Berlin",
-            data: [
-              -0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0,
-            ],
-          },
-          {
-            name: "London",
-            data: [
-              3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,
-            ],
-          },
+          // {
+          //   name: "Berlin",
+          //   data: [
+          //     -0.9, 0.6, 3.5, 8.4, 13.5, 17.0, 18.6, 17.9, 14.3, 9.0, 3.9, 1.0,
+          //   ],
+          // },
+          // {
+          //   name: "London",
+          //   data: [
+          //     3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8,
+          //   ],
+          // },
         ],
       },
     };
@@ -289,49 +376,67 @@ export default {
         ytitle: "",
         listData: [],
       };
+      this.listChart = [];
     },
     beforeClose(done) {
       this.dialogVisible = false;
+      if (this.form.listData.length > 0) {
+        this.initForm();
+      }
       done();
     },
     addNewData() {
       if (this.form.listData.length < 10) {
         this.form.listData.push({
-          modelData: "",
-          modelSeries: 0,
+          name: "",
+          y: 0,
         });
       }
+    },
+    clickBtnSubmit() {
+      if (this.typeAction === 'create') {
+        this.addNewChart();
+      } else {
+        this.updateChart();
+      }
+    },
+    updateChart() {
+      this.layout.forEach(el => {
+        if (el.i === this.itemUpdate.i) {
+          el.options.series[0].data = JSON.parse(JSON.stringify(this.form.listData));
+        }
+      });
+      this.closePopup();
     },
     addNewChart() {
       this.idErrorArr = [];
       this.titleErrorArr = [];
       this.countIndex++;
       this.form.listData.forEach((item, index) => {
-        if (item.modelSeries === 0) {
+        if (item.y === 0) {
           this.idErrorArr.push(index);
         }
-        if (!item.modelData) {
+        if (!item.name) {
           this.titleErrorArr.push(index);
         }
         switch (this.form.type) {
           case "pie":
-            this.dataChartPie.push([item.modelData, item.modelSeries]);
+            this.dataChartPie.push({name: item.name, y: item.y});
             if (index == this.form.listData.length - 1) {
               this.listChart.push({
                 type: "pie",
                 data: this.dataChartPie,
-                id: this.countIndex,
+                idChart: this.countIndex,
               });
               this.dataChartPie = [];
             }
-
             break;
           case "line":
-            this.datalineChart.push([item.modelData, item.modelSeries]);
+            this.datalineChart.push([item.name, item.y]);
             if (index == this.form.listData.length - 1) {
               this.listChart.push({
                 type: "line",
-                id: this.countIndex,
+                idChart: this.countIndex,
                 data: this.datalineChart,
                 xtitle: this.form.xtitle,
                 ytitle: this.form.ytitle,
@@ -343,23 +448,32 @@ export default {
             break;
         }
       });
-      this.initForm();
       if (this.idErrorArr.length > 0 || this.titleErrorArr.length > 0) {
         return;
       }
+        let options = JSON.parse(JSON.stringify(this.options));
+        options.series[0].data = this.listChart[0].data;
+        this.layout.push({ x: 0, y: 0, w: 2, h: 1, i: this.indexChart, width: "350", height: "350", chart: true, options: options });
+        this.indexChart++;
+        // this.dialogVisible = false;
+        this.closePopup();
+        this.initForm();
+
+    },
+    openPopup(type, itemUpdate) {
+      this.typeAction = type;
+      if (itemUpdate) {
+        this.itemUpdate = itemUpdate;
+        this.form.listData = JSON.parse(JSON.stringify(itemUpdate.options.series[0].data));
+      }
+      this.dialogVisible = true;
+    },
+    closePopup() {
+      if (this.form.listData.length > 0) {
+        this.initForm();
+      }
       this.dialogVisible = false;
-    },
-    isNumber(value) {
-      return typeof value === "number" && isFinite(value);
-    },
-
-    isNumberObject(n) {
-      return Object.prototype.toString.apply(n) === "[object Number]";
-    },
-
-    isCustomNumber(n) {
-      return this.isNumber(n) || this.isNumberObject(n);
-    },
+    }
   },
 };
 </script>
@@ -505,4 +619,13 @@ body {
     cursor: pointer;
 } */
 </style>
+<style>
+.icon-settings {
+  display: block;
+  text-align: right;
+}
 
+.icon-settings .v-icon {
+  cursor: pointer !important;
+}
+</style>
